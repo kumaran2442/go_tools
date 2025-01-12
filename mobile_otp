@@ -1,0 +1,52 @@
+package main
+
+import (
+	"fmt"
+	"math/rand"
+	"time"
+
+	"github.com/twilio/twilio-go"
+	"github.com/twilio/twilio-go/rest/api/v2010"
+)
+
+func main() {
+	// Twilio credentials
+	accountSID := "your_account_sid"
+	authToken := "your_auth_token"
+	twilioPhoneNumber := "+1234567890" // Replace with your Twilio phone number
+
+	// Recipient phone number
+	recipientPhoneNumber := "+911234567890" // Replace with recipient's phone number
+
+	// Generate a random 6-digit OTP
+	otp := generateOTP()
+
+	// Message content
+	message := fmt.Sprintf("Your OTP is: %s", otp)
+
+	// Initialize Twilio client
+	client := twilio.NewRestClientWithParams(twilio.ClientParams{
+		Username: accountSID,
+		Password: authToken,
+	})
+
+	// Send the SMS
+	params := &v2010.CreateMessageParams{}
+	params.SetTo(recipientPhoneNumber)
+	params.SetFrom(twilioPhoneNumber)
+	params.SetBody(message)
+
+	resp, err := client.ApiV2010.CreateMessage(params)
+	if err != nil {
+		fmt.Printf("Failed to send OTP: %v\n", err)
+		return
+	}
+
+	fmt.Printf("OTP sent successfully! SID: %s\n", *resp.Sid)
+}
+
+// generateOTP creates a random 6-digit OTP
+func generateOTP() string {
+	rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%06d", rand.Intn(1000000))
+}
