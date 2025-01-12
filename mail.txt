@@ -1,0 +1,21 @@
+package main
+
+import (
+	"gopkg.in/gomail.v2"
+)
+
+func main() {
+	m := gomail.NewMessage()
+	m.SetHeader("From", "Sender mail")
+	m.SetHeader("To", "reciever email")
+	m.SetHeader("Subject", "Test Email")
+	m.SetBody("text/plain", "Mail content")
+
+	d := gomail.NewDialer("smtp.example.com", 587, "sender_email", "password")
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+	println("Email sent successfully!")
+}
